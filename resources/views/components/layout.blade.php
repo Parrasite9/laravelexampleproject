@@ -33,8 +33,8 @@
             <div class="flex space-x-4">
               <!-- Current: "bg-gray-950/50 text-white", Default: "text-gray-300 hover:bg-white/5 hover:text-white" -->
               <x-nav-link href="/" :active="request()->is('/')" >Home</x-nav-link>
-              <x-nav-link href="/about" :active="request()->is('about')" >About</x-nav-link>
-              <x-nav-link href="/contact" :active="request()->is('contact')" >Contact</x-nav-link>
+              <x-nav-link href="/jobs" :active="request()->is('jobs')" >Jobs</x-nav-link>
+              <x-nav-link href="/contact" type="b" :active="request()->is('contact')" >Contact</x-nav-link>
             </div>
           </div>
         </div>
