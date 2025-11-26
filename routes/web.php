@@ -4,6 +4,7 @@ use App\Models\ActivityLog;
 use App\Models\Device;
 use Illuminate\Support\Facades\Route;
 use App\Models\Job;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 
@@ -32,41 +33,58 @@ Route::get('/contact', function() {
     return view ('contact');
 });
 
-Route::get('/relay/{power}', function ($power) {
+// Route::get('/relay/{power}', function ($power) {
 
-    $currentPower = $power;
+//     $currentPower = $power;
 
-    if ($power == 1) {
-        # code... TURN POWER ON
-        $NewEntry = new ActivityLog();
-        $NewEntry->value = 1;
-        $NewEntry->save();
-    } else {
-        # code... TURN POWER OFF
-        $NewEntry = new ActivityLog();
-        $NewEntry->value = 0;
-        $NewEntry->save();
-    }
+//     if ($power == 1) {
+//         # code... TURN POWER ON
+//         $NewEntry = new ActivityLog();
+//         $NewEntry->value = 1;
+//         $NewEntry->save();
+//     } else {
+//         # code... TURN POWER OFF
+//         $NewEntry = new ActivityLog();
+//         $NewEntry->value = 0;
+//         $NewEntry->save();
+//     }
 
-    if ($power == 1) {
-        $response = Http::get('http://63.41.58.8:8052/state.xml?relay1=1');
-            return 'Power is: On';
-    } else {
-        $response = Http::get('http://63.41.58.8:8052/state.xml?relay1=0');
-            return 'Power is: Off';
-    }
-});
+//     if ($power == 1) {
+//         $response = Http::get('http://63.41.58.8:8052/state.xml?relay1=1');
+//             return 'Power is: On';
+//     } else {
+//         $response = Http::get('http://63.41.58.8:8052/state.xml?relay1=0');
+//             return 'Power is: Off';
+//     }
+// });
 
 Route::get('/relay', function() {
     $devices = Device::all();
     return view ('devices', compact('devices'));
 });
 
-Route::get('/relay/{ip}/{value}', function ($ip, $value) {
+// CREATE A FORM TO UPDATE EXISTING DEVICES AND THEIR DATA
+
+// Route::get('/relay/{ip}/{value}/details', function ($ip, $value) {
+Route::get('/relay/{id}/details', function ($id) {
+    $device = Device::findOrFail($id);
+    return view('details', ['device' => $device]);
+});
+
+Route::post('/relay/{id}/details', function ($id, Request $request) {
+    $device = Device::findOrFail($id);
+
+    $device->ip = $request->input('ip');
+    $device->save();
+
+    return back()->with('success', 'Device updated successfully');
+});
+
+Route::get('/relay/{id}/{value}', function ($id, $value) {
     $value = (int) $value;
 
     // Find the device by IP
-    $device = Device::where('ip', $ip)->firstOrFail();
+    $device = Device::findorFail($id);
 
     $device->value = $value;
     $device->save();
@@ -101,8 +119,11 @@ Route::get('/relay/{ip}/{value}', function ($ip, $value) {
 
 });
 
+
+
 Route::get('/history', function () {
     $ActivityLog = ActivityLog::all();
 
     return $ActivityLog;
 });
+
